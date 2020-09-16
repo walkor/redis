@@ -31,3 +31,7 @@ $worker->onMessage = function($connection, $data) {
 
 Worker::runAll();
 ```
+
+## Document
+
+http://doc.workerman.net/components/workerman-redis.html

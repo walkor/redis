@@ -418,7 +418,7 @@ class Client
             $this->closeConnection();
             $this->_error = "Workerman Redis Connection to {$this->_address} timeout ({$timeout} seconds)";
             if ($this->_connectionCallback) {
-                \call_user_func($this->_connectionCallback, false);
+                \call_user_func($this->_connectionCallback, false, $this);
             } else {
                 echo $this->_error . "\n";
             }
