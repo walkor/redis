@@ -214,6 +214,11 @@ class Client
     protected $_db = 0;
 
     /**
+     * @var string|array
+     */
+    protected $_auth = null;
+
+    /**
      * @var bool
      */
     protected $_waiting = true;
@@ -247,6 +252,11 @@ class Client
      * @var bool
      */
     protected $_subscribe = false;
+
+    /**
+     * @var bool
+     */
+    protected $_firstConnect = true;
 
     /**
      * Client constructor.
@@ -323,14 +333,22 @@ class Client
                 Timer::del($this->_reconnectTimer);
                 $this->_reconnectTimer = null;
             }
+
             if ($this->_db) {
-                $this->select($this->_db);
+                $this->_queue = \array_merge([[['SELECT', $this->_db], time(), null]], $this->_queue);
             }
+
+            if ($this->_auth) {
+                $this->_queue = \array_merge([[['AUTH', $this->_auth], time(), null]],  $this->_queue);
+            }
+
+            $this->_firstConnect = false;
+
             $this->_connection->onError = function ($code, $msg) {
                 echo new \Exception("Workerman Redis Connection Error $code $msg");
             };
-            $this->_connectionCallback && \call_user_func($this->_connectionCallback, true, $this);
             $this->process();
+            $this->_firstConnect && $this->_connectionCallback && \call_user_func($this->_connectionCallback, true, $this);
         };
 
         $time_start = microtime(true);
@@ -343,7 +361,7 @@ class Client
                 echo $exception;
                 return;
             }
-            \call_user_func($this->_connectionCallback, false, $this);
+            $this->_firstConnect && \call_user_func($this->_connectionCallback, false, $this);
         };
 
         $this->_connection->onClose = function () use ($time_start) {
@@ -417,7 +435,7 @@ class Client
             }
             $this->closeConnection();
             $this->_error = "Workerman Redis Connection to {$this->_address} timeout ({$timeout} seconds)";
-            if ($this->_connectionCallback) {
+            if ($this->_firstConnect && $this->_connectionCallback) {
                 \call_user_func($this->_connectionCallback, false, $this);
             } else {
                 echo $this->_error . "\n";
@@ -435,8 +453,8 @@ class Client
         if (!$this->_connection || $this->_waiting || empty($this->_queue) || $this->_subscribe) {
             return;
         }
-
-        $queue = current($this->_queue);
+        \reset($this->_queue);
+        $queue = \current($this->_queue);
         if ($queue[0][0] === 'SUBSCRIBE' || $queue[0][0] === 'PSUBSCRIBE') {
             $this->_subscribe = true;
         }
@@ -509,8 +527,29 @@ class Client
      */
     public function select($db, $cb = null)
     {
-        $this->_db = $db;
-        $this->_queue[] = [['SELECT', $db], time(), $cb];
+        $format = function ($result) use ($db) {
+            $this->_db = $db;
+            return $result;
+        };
+        $cb = $cb ? $cb : function(){};
+        $this->_queue[] = [['SELECT', $db], time(), $cb, $format];
+        $this->process();
+    }
+
+    /**
+     * auth
+     *
+     * @param string|array $auth
+     * @param null $cb
+     */
+    public function auth($auth, $cb = null)
+    {
+        $format = function ($result) use ($auth) {
+            $this->_auth = $auth;
+            return $result;
+        };
+        $cb = $cb ? $cb : function(){};
+        $this->_queue[] = [['AUTH', $auth], time(), $cb, $format];
         $this->process();
     }
 
