@@ -132,7 +132,7 @@ class Redis
                 return [$type, \substr($buffer, $pos + 2, (int)substr($buffer, 1, $pos))];
             case '*':
                 if(0 === strpos($buffer, '*-1')) {
-                    return null;
+                    return [$type, null];
                 }
                 $pos = \strpos($buffer, "\r\n");
                 $value = [];
