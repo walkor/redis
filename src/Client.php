@@ -342,13 +342,12 @@ class Client
                 $this->_queue = \array_merge([[['AUTH', $this->_auth], time(), null]],  $this->_queue);
             }
 
-            $this->_firstConnect = false;
-
             $this->_connection->onError = function ($code, $msg) {
                 echo new \Exception("Workerman Redis Connection Error $code $msg");
             };
             $this->process();
             $this->_firstConnect && $this->_connectionCallback && \call_user_func($this->_connectionCallback, true, $this);
+            $this->_firstConnect = false;
         };
 
         $time_start = microtime(true);
