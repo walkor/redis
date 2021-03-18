@@ -342,7 +342,7 @@ class Client
                 $this->_queue = \array_merge([[['AUTH', $this->_auth], time(), null]],  $this->_queue);
             }
 
-            $this->_connection->onError = function ($code, $msg) {
+            $this->_connection->onError = function ($connection, $code, $msg) {
                 echo new \Exception("Workerman Redis Connection Error $code $msg");
             };
             $this->process();
