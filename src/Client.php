@@ -429,7 +429,7 @@ class Client
 
         $this->_connectTimeoutTimer = Timer::add($timeout, function () use ($timeout) {
             $this->_connectTimeoutTimer = null;
-            if ($this->_connection && $this->_connection->status(false) === 'ESTABLISHED') {
+            if ($this->_connection && $this->_connection->getStatus(false) === 'ESTABLISHED') {
                 return;
             }
             $this->closeConnection();
