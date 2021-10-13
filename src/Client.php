@@ -286,7 +286,7 @@ class Client
             $current_command = $current_queue[0][0];
             $ignore_first_queue = in_array($current_command, ['BLPOP', 'BRPOP']);
             $time = time();
-            $timeout = isset($this->_options['wait_timeout']) ? $this->_options['wait_timeout'] : 10;
+            $timeout = isset($this->_options['wait_timeout']) ? $this->_options['wait_timeout'] : 600;
             $has_timeout = false;
             $first_queue = true;
             foreach ($this->_queue as $key => $queue) {
