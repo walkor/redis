@@ -14,7 +14,7 @@
 namespace Workerman\Redis;
 
 use Workerman\Connection\AsyncTcpConnection;
-use Workerman\Lib\Timer;
+use Workerman\Timer;
 
 /**
  * Class Client
