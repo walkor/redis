@@ -394,7 +394,9 @@ class Client
             }
             if (empty($this->_queue)) {
                 $this->_queue = [];
-                gc_mem_caches();
+                if (function_exists('gc_mem_caches')) {
+                    gc_mem_caches();
+                }
             }
             $success = $type === '-' || $type === '!' ? false : true;
             $exception = false;
