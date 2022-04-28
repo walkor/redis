@@ -392,6 +392,10 @@ class Client
             if (!$this->_subscribe) {
                 unset($this->_queue[key($this->_queue)]);
             }
+            if (empty($this->_queue)) {
+                $this->_queue = [];
+                gc_mem_caches();
+            }
             $success = $type === '-' || $type === '!' ? false : true;
             $exception = false;
             $result = false;
