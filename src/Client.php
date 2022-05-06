@@ -811,6 +811,12 @@ class Client
         $this->_connection->onMessge = null;
         $this->_connection->close();
         $this->_connection = null;
+        if ($this->_connectTimeoutTimer) {
+            Timer::del($this->_connectTimeoutTimer);
+        }
+        if ($this->_reconnectTimer) {
+            Timer::del($this->_reconnectTimer);
+        }
     }
 
     /**
@@ -830,6 +836,10 @@ class Client
     {
         $this->closeConnection();
         $this->_queue = [];
+        gc_collect_cycles();
+        if (function_exists('gc_mem_caches')) {
+            gc_mem_caches();
+        }
     }
 
     /**
@@ -871,4 +881,5 @@ class Client
     {
         throw new Exception('Not implemented');
     }
+
 }
