@@ -172,7 +172,7 @@ class Redis
                 }
                 return [$type, $value];
             default:
-                return ['!', "protocol error, got '$type' as reply type byte."];
+                return ['!', "protocol error, got '$type' as reply type byte. buffer:".bin2hex($buffer)];
 
         }
     }
