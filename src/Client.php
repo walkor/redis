@@ -323,6 +323,9 @@ class Client
         $timeout = isset($this->_options['connect_timeout']) ? $this->_options['connect_timeout'] : 5;
         $context = isset($this->_options['context']) ? $this->_options['context'] : [];
         $this->_connection = new AsyncTcpConnection($this->_address, $context);
+        if(!empty($this->_options['ssl'])){
+            $this->_connection->transport = 'ssl';
+        }
 
         $this->_connection->onConnect = function () {
             $this->_waiting = false;
