@@ -15,6 +15,7 @@ namespace Workerman\Redis;
 
 use Revolt\EventLoop;
 use Workerman\Connection\AsyncTcpConnection;
+use Workerman\Redis\Protocols\Redis;
 use Workerman\Timer;
 
 /**
@@ -323,6 +324,7 @@ class Client
         $timeout = isset($this->_options['connect_timeout']) ? $this->_options['connect_timeout'] : 5;
         $context = isset($this->_options['context']) ? $this->_options['context'] : [];
         $this->_connection = new AsyncTcpConnection($this->_address, $context);
+        $this->_connection->protocol = Redis::class;
         if(!empty($this->_options['ssl'])){
             $this->_connection->transport = 'ssl';
         }
