@@ -896,8 +896,10 @@ class Client
     public function __call($method, $args)
     {
         $cb = null;
-        if (\is_callable(end($args))) {
-            $cb = array_pop($args);
+        if (count($args) > 1 || in_array($method, ['randomKey', 'multi', 'exec', 'discard'])) {
+            if (\is_callable(end($args))) {
+                $cb = array_pop($args);
+            }
         }
 
         \array_unshift($args, \strtoupper($method));
