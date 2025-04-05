@@ -50,6 +50,9 @@ class Redis
                 }
                 $count = (int)substr($buffer, 1, $pos - 1);
                 while ($count --) {
+                    if (strlen($buffer) < $pos + 2) {
+                        return 0;
+                    }
                     $next_pos = strpos($buffer, "\r\n", $pos + 2);
                     if (!$next_pos) {
                         return 0;
